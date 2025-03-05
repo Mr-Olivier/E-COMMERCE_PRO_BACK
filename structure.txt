@@ -1,0 +1,44 @@
+ecommerce-backend/
+├── prisma/
+│   ├── migrations/       # Generated database migrations
+│   └── schema.prisma     # Prisma schema file
+├── src/
+│   ├── config/
+│   │   └── config.ts     # App configuration
+│   ├── controllers/
+│   │   ├── auth.controller.ts     # Authentication logic
+│   │   ├── product.controller.ts  # Product management
+│   │   ├── order.controller.ts    # Order processing 
+│   │   ├── payment.controller.ts  # Payment handling
+│   │   └── admin.controller.ts    # Admin operations
+│   ├── middlewares/
+│   │   ├── auth.middleware.ts     # JWT verification
+│   │   ├── error.middleware.ts    # Error handling
+│   │   └── validation.middleware.ts # Request validation
+│   ├── routes/
+│   │   ├── auth.routes.ts         # Authentication routes
+│   │   ├── product.routes.ts      # Product routes
+│   │   ├── order.routes.ts        # Order routes
+│   │   ├── payment.routes.ts      # Payment routes
+│   │   └── admin.routes.ts        # Admin routes
+│   ├── services/
+│   │   ├── prisma.service.ts      # Database client
+│   │   ├── email.service.ts       # Email functionality
+│   │   └── payment.service.ts     # Payment processing
+│   ├── utils/
+│   │   ├── jwt.ts                 # JWT token handling
+│   │   ├── otp.ts                 # OTP generation
+│   │   └── helpers.ts             # Utility functions
+│   ├── validations/
+│   │   ├── auth.validation.ts     # Auth validations
+│   │   ├── product.validation.ts  # Product validations
+│   │   └── order.validation.ts    # Order validations
+│   ├── types/
+│   │   └── express.d.ts           # Type declarations
+│   ├── app.ts                     # Express application setup
+│   └── server.ts                  # Server startup
+├── .env                           # Environment variables
+├── .gitignore                     # Git ignore file
+├── package.json                   # Project dependencies
+├── tsconfig.json                  # TypeScript configuration
+└── README.md                      # Project documentation
