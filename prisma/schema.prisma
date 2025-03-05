@@ -1,0 +1,95 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define the UserRole enum
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}
+
+// Define the OrderStatus enum
+enum OrderStatus {
+  PENDING
+  SHIPPED
+  DELIVERED
+  CANCELLED
+}
+
+// Define the User model
+model User {
+  id                String    @id @default(uuid())
+  firstName         String
+  lastName          String
+  email             String    @unique
+  phoneNumber       String    @unique
+  password          String
+  role              UserRole  @default(CUSTOMER)
+  isVerified        Boolean   @default(false)
+  verificationCode  String?
+  verificationExpiry DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  orders            Order[]
+  reviews           Review[]
+}
+
+// Define the Product model
+model Product {
+  id          String     @id @default(uuid())
+  name        String
+  price       Decimal
+  description String
+  category    String
+  stock       Int
+  images      String[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  reviews     Review[]
+  orderItems  OrderItem[]
+}
+
+// Define the Order model
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  totalAmount Decimal
+  status      OrderStatus @default(PENDING)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+}
+
+// Define the OrderItem model
+model OrderItem {
+  id        String  @id @default(uuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id])
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Decimal
+}
+
+// Define the Review model
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  rating    Int
+  comment   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([productId, userId])
+}
