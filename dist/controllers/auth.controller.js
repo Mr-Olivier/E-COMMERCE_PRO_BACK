@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPassword = exports.verifyResetOtp = exports.forgotPassword = exports.resendOtp = exports.login = exports.verifyOtp = exports.register = void 0;
+exports.changePassword = exports.logout = exports.resetPassword = exports.verifyResetOtp = exports.forgotPassword = exports.resendOtp = exports.login = exports.verifyOtp = exports.register = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_service_1 = __importDefault(require("../services/prisma.service"));
 const jwt_1 = require("../utils/jwt");
@@ -268,7 +268,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
         // Determine redirect URL based on user role
         let redirectUrl = "/dashboard"; // Default
         if (user.role === "ADMIN") {
-            redirectUrl = "/admin/dashboard";
+            redirectUrl = "/admin";
         }
         else if (user.role === "CUSTOMER") {
             redirectUrl = "/customer/dashboard";
@@ -485,3 +485,82 @@ const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
 });
 exports.resetPassword = resetPassword;
+const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Clear the token cookie
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Logged out successfully",
+        });
+    }
+    catch (error) {
+        console.error("Logout error:", error);
+        next(error);
+    }
+});
+exports.logout = logout;
+// Add to src/controllers/auth.controller.ts
+const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+        if (!userId) {
+            res.status(401).json({
+                status: "error",
+                message: "Authentication required",
+            });
+            return;
+        }
+        // Find user
+        const user = yield prisma_service_1.default.user.findUnique({
+            where: { id: userId },
+        });
+        if (!user) {
+            res.status(404).json({
+                status: "error",
+                message: "User not found",
+            });
+            return;
+        }
+        // Verify current password
+        const isPasswordValid = yield bcrypt_1.default.compare(currentPassword, user.password);
+        if (!isPasswordValid) {
+            res.status(401).json({
+                status: "error",
+                message: "Current password is incorrect",
+            });
+            return;
+        }
+        // Check if new password is different from current
+        const isSamePassword = yield bcrypt_1.default.compare(newPassword, user.password);
+        if (isSamePassword) {
+            res.status(400).json({
+                status: "error",
+                message: "New password must be different from current password",
+            });
+            return;
+        }
+        // Hash new password
+        const hashedPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        // Update password
+        yield prisma_service_1.default.user.update({
+            where: { id: userId },
+            data: { password: hashedPassword },
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Password changed successfully",
+        });
+    }
+    catch (error) {
+        console.error("Change password error:", error);
+        next(error);
+    }
+});
+exports.changePassword = changePassword;
