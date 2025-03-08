@@ -9,6 +9,7 @@ dotenv.config();
 
 // Import routes
 import authRoutes from "./routes/auth.routes";
+import userRoutes from "./routes/user.routes";
 
 // Import middleware
 import { errorHandler } from "./middlewares/error.middleware";
@@ -26,6 +27,7 @@ app.use(cookieParser());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 
 // Simple health check route
 app.get("/", (req, res) => {
