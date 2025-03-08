@@ -12,6 +12,7 @@ const cookie_parser_1 = __importDefault(require("cookie-parser"));
 dotenv_1.default.config();
 // Import routes
 const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
+const user_routes_1 = __importDefault(require("./routes/user.routes"));
 // Import middleware
 const error_middleware_1 = require("./middlewares/error.middleware");
 // Initialize Express app
@@ -25,6 +26,7 @@ app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
 // Routes
 app.use("/api/auth", auth_routes_1.default);
+app.use("/api/users", user_routes_1.default);
 // Simple health check route
 app.get("/", (req, res) => {
     res.json({
