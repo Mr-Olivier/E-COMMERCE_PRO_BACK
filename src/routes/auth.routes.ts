@@ -6,7 +6,19 @@ import {
   registerValidation,
   verifyOtpValidation,
   loginValidation,
+  forgotPasswordValidation,
+  verifyResetOtpValidation,
+  resetPasswordValidation,
 } from "../validations/auth.validation";
+import {
+  register,
+  verifyOtp,
+  login,
+  resendOtp,
+  forgotPassword,
+  verifyResetOtp,
+  resetPassword,
+} from "../controllers/auth.controller";
 
 const router = Router();
 
@@ -28,6 +40,29 @@ router.post(
   "/resend-otp",
   validate([verifyOtpValidation[0]]),
   authController.resendOtp
+);
+
+// Add these routes to your auth.routes.ts file
+
+// Forgot password - request reset
+router.post(
+  "/forgot-password",
+  validate(forgotPasswordValidation),
+  forgotPassword
+);
+
+// Verify reset OTP
+router.post(
+  "/verify-reset-otp",
+  validate(verifyResetOtpValidation),
+  verifyResetOtp
+);
+
+// Reset password with new password
+router.post(
+  "/reset-password",
+  validate(resetPasswordValidation),
+  resetPassword
 );
 
 export default router;
