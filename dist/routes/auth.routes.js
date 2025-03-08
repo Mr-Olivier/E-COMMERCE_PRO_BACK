@@ -39,6 +39,7 @@ const authController = __importStar(require("../controllers/auth.controller"));
 const validation_middleware_1 = require("../middlewares/validation.middleware");
 const auth_validation_1 = require("../validations/auth.validation");
 const auth_controller_1 = require("../controllers/auth.controller");
+const auth_middleware_1 = require("../middlewares/auth.middleware");
 const router = (0, express_1.Router)();
 // Register
 router.post("/register", (0, validation_middleware_1.validate)(auth_validation_1.registerValidation), authController.register);
@@ -55,4 +56,5 @@ router.post("/forgot-password", (0, validation_middleware_1.validate)(auth_valid
 router.post("/verify-reset-otp", (0, validation_middleware_1.validate)(auth_validation_1.verifyResetOtpValidation), auth_controller_1.verifyResetOtp);
 // Reset password with new password
 router.post("/reset-password", (0, validation_middleware_1.validate)(auth_validation_1.resetPasswordValidation), auth_controller_1.resetPassword);
+router.post("/logout", auth_middleware_1.authenticate, auth_controller_1.logout);
 exports.default = router;
