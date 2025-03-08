@@ -50,7 +50,11 @@ generate_commit_message() {
             ;;
         src/controllers/auth.controller.ts)
             type="feat(api)"
-            message="add authentication controller"
+            message="implement password reset in auth controller"
+            ;;
+        src/routes/auth.routes.ts)
+            type="feat(api)"
+            message="add password reset endpoints to auth routes"
             ;;
         src/middlewares/auth.middleware.ts)
             type="feat(middleware)"
@@ -66,7 +70,7 @@ generate_commit_message() {
             ;;
         src/services/email.service.ts)
             type="feat(service)"
-            message="add email service"
+            message="add password reset email templates"
             ;;
         src/services/prisma.service.ts)
             type="feat(service)"
@@ -95,6 +99,10 @@ generate_commit_message() {
         src/types/*)
             type="feat(types)"
             message="add TypeScript type definitions"
+            ;;
+        src/validations/auth.validation.ts)
+            type="feat(validation)"
+            message="add validation schemas for password reset"
             ;;
         src/validations/*)
             type="feat(validation)"
@@ -146,6 +154,10 @@ commit_and_push_changes() {
         "dist/services/email.service.js"
         "dist/validations/auth.validation.js"
         "prisma/schema.prisma"
+        "src/controllers/auth.controller.ts"
+        "src/routes/auth.routes.ts"
+        "src/services/email.service.ts"
+        "src/validations/auth.validation.ts"
     )
 
     # Untracked files
