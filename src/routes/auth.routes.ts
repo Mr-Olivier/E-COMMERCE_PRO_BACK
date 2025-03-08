@@ -18,7 +18,9 @@ import {
   forgotPassword,
   verifyResetOtp,
   resetPassword,
+  logout,
 } from "../controllers/auth.controller";
+import { authenticate } from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -64,5 +66,7 @@ router.post(
   validate(resetPasswordValidation),
   resetPassword
 );
+
+router.post("/logout", authenticate, logout);
 
 export default router;
