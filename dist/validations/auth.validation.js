@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resetPasswordValidation = exports.verifyResetOtpValidation = exports.forgotPasswordValidation = exports.loginValidation = exports.verifyOtpValidation = exports.registerValidation = void 0;
+exports.changePasswordValidation = exports.resetPasswordValidation = exports.verifyResetOtpValidation = exports.forgotPasswordValidation = exports.loginValidation = exports.verifyOtpValidation = exports.registerValidation = void 0;
 const express_validator_1 = require("express-validator");
 exports.registerValidation = [
     (0, express_validator_1.body)("firstName")
@@ -97,6 +97,29 @@ exports.resetPasswordValidation = [
         .withMessage("Email is required")
         .isEmail()
         .withMessage("Must be a valid email address"),
+    (0, express_validator_1.body)("newPassword")
+        .notEmpty()
+        .withMessage("New password is required")
+        .isLength({ min: 8 })
+        .withMessage("Password must be at least 8 characters long")
+        .matches(/[a-zA-Z]/)
+        .withMessage("Password must contain at least one letter")
+        .matches(/\d/)
+        .withMessage("Password must contain at least one number"),
+    (0, express_validator_1.body)("confirmPassword")
+        .notEmpty()
+        .withMessage("Password confirmation is required")
+        .custom((value, { req }) => {
+        if (value !== req.body.newPassword) {
+            throw new Error("Passwords do not match");
+        }
+        return true;
+    }),
+];
+exports.changePasswordValidation = [
+    (0, express_validator_1.body)("currentPassword")
+        .notEmpty()
+        .withMessage("Current password is required"),
     (0, express_validator_1.body)("newPassword")
         .notEmpty()
         .withMessage("New password is required")
