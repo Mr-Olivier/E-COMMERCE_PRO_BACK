@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.resendOtp = exports.login = exports.verifyOtp = exports.register = void 0;
+exports.resetPassword = exports.verifyResetOtp = exports.forgotPassword = exports.resendOtp = exports.login = exports.verifyOtp = exports.register = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const prisma_service_1 = __importDefault(require("../services/prisma.service"));
 const jwt_1 = require("../utils/jwt");
@@ -161,6 +161,66 @@ const verifyOtp = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.verifyOtp = verifyOtp;
+// export const login = async (
+//   req: Request,
+//   res: Response,
+//   next: NextFunction
+// ): Promise<void> => {
+//   try {
+//     const { email, password } = req.body;
+//     // Find user by email
+//     const user = await prisma.user.findUnique({
+//       where: { email },
+//     });
+//     if (!user) {
+//       res.status(401).json({
+//         status: "error",
+//         message: "Invalid credentials",
+//       });
+//       return;
+//     }
+//     // Check if user is verified
+//     if (!user.isVerified) {
+//       res.status(401).json({
+//         status: "error",
+//         message: "Please verify your email address before logging in",
+//       });
+//       return;
+//     }
+//     // Verify password
+//     const isPasswordValid = await bcrypt.compare(password, user.password);
+//     if (!isPasswordValid) {
+//       res.status(401).json({
+//         status: "error",
+//         message: "Invalid credentials",
+//       });
+//       return;
+//     }
+//     // Generate token
+//     const token = generateToken({
+//       id: user.id,
+//       email: user.email,
+//       role: user.role,
+//     });
+//     res.status(200).json({
+//       status: "success",
+//       message: "Login successful",
+//       data: {
+//         token,
+//         user: {
+//           id: user.id,
+//           firstName: user.firstName,
+//           lastName: user.lastName,
+//           email: user.email,
+//           role: user.role,
+//         },
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Login error:", error);
+//     next(error);
+//   }
+// };
 const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -198,6 +258,22 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
             email: user.email,
             role: user.role,
         });
+        // Set token as a cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+        });
+        // Determine redirect URL based on user role
+        let redirectUrl = "/dashboard"; // Default
+        if (user.role === "ADMIN") {
+            redirectUrl = "/admin/dashboard";
+        }
+        else if (user.role === "CUSTOMER") {
+            redirectUrl = "/customer/dashboard";
+        }
+        // Send successful JSON response
         res.status(200).json({
             status: "success",
             message: "Login successful",
@@ -210,6 +286,7 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
                     email: user.email,
                     role: user.role,
                 },
+                redirectUrl: redirectUrl, // Include the redirect URL in the response
             },
         });
     }
@@ -265,3 +342,146 @@ const resendOtp = (req, res, next) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.resendOtp = resendOtp;
+// Add these functions to your auth.controller.ts file
+const forgotPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email } = req.body;
+        // Find user by email
+        const user = yield prisma_service_1.default.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            res.status(404).json({
+                status: "error",
+                message: "User not found",
+            });
+            return;
+        }
+        // Generate password reset code
+        const resetPasswordCode = (0, otp_1.generateOTP)();
+        const resetPasswordExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+        // Update user with reset password data
+        yield prisma_service_1.default.user.update({
+            where: { id: user.id },
+            data: {
+                resetPasswordCode,
+                resetPasswordExpiry,
+            },
+        });
+        // Send password reset email
+        yield email_service_1.default.sendPasswordResetEmail(email, user.firstName, resetPasswordCode);
+        res.status(200).json({
+            status: "success",
+            message: "Password reset instructions sent to your email",
+        });
+    }
+    catch (error) {
+        console.error("Forgot password error:", error);
+        next(error);
+    }
+});
+exports.forgotPassword = forgotPassword;
+const verifyResetOtp = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, otp } = req.body;
+        // Find user by email
+        const user = yield prisma_service_1.default.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            res.status(404).json({
+                status: "error",
+                message: "User not found",
+            });
+            return;
+        }
+        // Check if reset code exists and is valid
+        if (!user.resetPasswordCode || !user.resetPasswordExpiry) {
+            res.status(400).json({
+                status: "error",
+                message: "Reset code not found. Please request a new one",
+            });
+            return;
+        }
+        // Check if reset code is expired
+        if (user.resetPasswordExpiry < new Date()) {
+            res.status(400).json({
+                status: "error",
+                message: "Reset code has expired. Please request a new one",
+            });
+            return;
+        }
+        // Check if reset code matches
+        if (user.resetPasswordCode !== otp) {
+            res.status(400).json({
+                status: "error",
+                message: "Invalid reset code",
+            });
+            return;
+        }
+        res.status(200).json({
+            status: "success",
+            message: "Reset code verified successfully",
+            data: {
+                email: user.email,
+            },
+        });
+    }
+    catch (error) {
+        console.error("Verify reset OTP error:", error);
+        next(error);
+    }
+});
+exports.verifyResetOtp = verifyResetOtp;
+const resetPassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, newPassword } = req.body;
+        // Find user by email
+        const user = yield prisma_service_1.default.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            res.status(404).json({
+                status: "error",
+                message: "User not found",
+            });
+            return;
+        }
+        // Check if reset code exists and is valid
+        if (!user.resetPasswordCode || !user.resetPasswordExpiry) {
+            res.status(400).json({
+                status: "error",
+                message: "Reset code not found or already used",
+            });
+            return;
+        }
+        // Check if reset code is expired
+        if (user.resetPasswordExpiry < new Date()) {
+            res.status(400).json({
+                status: "error",
+                message: "Reset session has expired. Please request a new reset",
+            });
+            return;
+        }
+        // Hash the new password
+        const hashedPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        // Update user's password and clear reset data
+        yield prisma_service_1.default.user.update({
+            where: { id: user.id },
+            data: {
+                password: hashedPassword,
+                resetPasswordCode: null,
+                resetPasswordExpiry: null,
+            },
+        });
+        res.status(200).json({
+            status: "success",
+            message: "Password has been reset successfully",
+        });
+    }
+    catch (error) {
+        console.error("Reset password error:", error);
+        next(error);
+    }
+});
+exports.resetPassword = resetPassword;
