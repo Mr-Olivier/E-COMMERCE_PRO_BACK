@@ -305,7 +305,7 @@ export const login = async (
     let redirectUrl = "/dashboard"; // Default
 
     if (user.role === "ADMIN") {
-      redirectUrl = "/admin/dashboard";
+      redirectUrl = "/admin";
     } else if (user.role === "CUSTOMER") {
       redirectUrl = "/customer/dashboard";
     }
@@ -388,6 +388,182 @@ export const resendOtp = async (
     });
   } catch (error) {
     console.error("Resend OTP error:", error);
+    next(error);
+  }
+};
+
+// Add these functions to your auth.controller.ts file
+
+export const forgotPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+      return;
+    }
+
+    // Generate password reset code
+    const resetPasswordCode = generateOTP();
+    const resetPasswordExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes from now
+
+    // Update user with reset password data
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        resetPasswordCode,
+        resetPasswordExpiry,
+      },
+    });
+
+    // Send password reset email
+    await emailService.sendPasswordResetEmail(
+      email,
+      user.firstName,
+      resetPasswordCode
+    );
+
+    res.status(200).json({
+      status: "success",
+      message: "Password reset instructions sent to your email",
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    next(error);
+  }
+};
+
+export const verifyResetOtp = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email, otp } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+      return;
+    }
+
+    // Check if reset code exists and is valid
+    if (!user.resetPasswordCode || !user.resetPasswordExpiry) {
+      res.status(400).json({
+        status: "error",
+        message: "Reset code not found. Please request a new one",
+      });
+      return;
+    }
+
+    // Check if reset code is expired
+    if (user.resetPasswordExpiry < new Date()) {
+      res.status(400).json({
+        status: "error",
+        message: "Reset code has expired. Please request a new one",
+      });
+      return;
+    }
+
+    // Check if reset code matches
+    if (user.resetPasswordCode !== otp) {
+      res.status(400).json({
+        status: "error",
+        message: "Invalid reset code",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Reset code verified successfully",
+      data: {
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error("Verify reset OTP error:", error);
+    next(error);
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const { email, newPassword } = req.body;
+
+    // Find user by email
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+      return;
+    }
+
+    // Check if reset code exists and is valid
+    if (!user.resetPasswordCode || !user.resetPasswordExpiry) {
+      res.status(400).json({
+        status: "error",
+        message: "Reset code not found or already used",
+      });
+      return;
+    }
+
+    // Check if reset code is expired
+    if (user.resetPasswordExpiry < new Date()) {
+      res.status(400).json({
+        status: "error",
+        message: "Reset session has expired. Please request a new reset",
+      });
+      return;
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password and clear reset data
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordCode: null,
+        resetPasswordExpiry: null,
+      },
+    });
+
+    res.status(200).json({
+      status: "success",
+      message: "Password has been reset successfully",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
     next(error);
   }
 };
