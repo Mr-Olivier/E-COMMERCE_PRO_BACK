@@ -13,6 +13,7 @@ import authRoutes from "./routes/auth.routes";
 import userRoutes from "./routes/user.routes";
 import productRoutes from "./routes/product.routes";
 import cartRoutes from "./routes/cart.routes";
+import paymentRoutes from "./routes/payment.routes";
 
 // Import middleware
 import { errorHandler } from "./middlewares/error.middleware";
@@ -52,6 +53,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/checkout", paymentRoutes);
 
 // Simple health check route
 app.get("/", (req, res) => {
