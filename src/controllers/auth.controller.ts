@@ -592,7 +592,6 @@ export const logout = async (
   }
 };
 
-// Add to src/controllers/auth.controller.ts
 export const changePassword = async (
   req: AuthRequest,
   res: Response,
