@@ -16,6 +16,7 @@ const auth_routes_1 = __importDefault(require("./routes/auth.routes"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const product_routes_1 = __importDefault(require("./routes/product.routes"));
 const cart_routes_1 = __importDefault(require("./routes/cart.routes"));
+const payment_routes_1 = __importDefault(require("./routes/payment.routes"));
 // Import middleware
 const error_middleware_1 = require("./middlewares/error.middleware");
 // Initialize Express app
@@ -43,6 +44,7 @@ app.use("/api/auth", auth_routes_1.default);
 app.use("/api/users", user_routes_1.default);
 app.use("/api/products", product_routes_1.default);
 app.use("/api/cart", cart_routes_1.default);
+app.use("/api/checkout", payment_routes_1.default);
 // Simple health check route
 app.get("/", (req, res) => {
     res.json({
