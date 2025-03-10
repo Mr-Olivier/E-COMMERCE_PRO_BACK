@@ -504,7 +504,6 @@ const logout = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.logout = logout;
-// Add to src/controllers/auth.controller.ts
 const changePassword = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
