@@ -10,123 +10,103 @@ generate_commit_message() {
     case "$file" in
         package-lock.json|package.json)
             type="chore(deps)"
-            message="setup project dependencies"
+            message="update project dependencies"
             ;;
         prisma/schema.prisma)
             type="feat(db)"
-            message="add password reset fields to schema"
+            message="update database schema with product and cart models"
             ;;
-        prisma/migrations/*)
+        prisma/migrations/20250308192727_add_product_fields/)
             type="chore(db)"
-            message="add password reset migration"
+            message="add migration for product fields"
             ;;
-        dist/*)
-            type="build"
-            message="update compiled TypeScript files"
+        prisma/migrations/20250309205300_add_cart_models/)
+            type="chore(db)"
+            message="add migration for cart models"
             ;;
         dist/app.js)
             type="build"
             message="update compiled Express application"
             ;;
-        dist/server.js)
-            type="build"
-            message="update compiled server initialization"
-            ;;
         dist/controllers/auth.controller.js)
             type="build"
-            message="update compiled auth controller with password reset"
+            message="update compiled auth controller"
             ;;
-        dist/routes/auth.routes.js)
+        dist/controllers/product.controller.js)
             type="build"
-            message="update compiled auth routes with password reset endpoints"
+            message="add compiled product controller"
             ;;
-        dist/services/email.service.js)
+        dist/controllers/cart.controller.js)
             type="build"
-            message="update compiled email service for password reset"
+            message="add compiled cart controller"
             ;;
-        dist/validations/auth.validation.js)
+        dist/routes/product.routes.js)
             type="build"
-            message="update compiled validation schemas for password reset"
+            message="add compiled product routes"
             ;;
-        src/controllers/auth.controller.ts)
-            type="feat(api)"
-            message="implement password reset in auth controller"
+        dist/routes/cart.routes.js)
+            type="build"
+            message="add compiled cart routes"
             ;;
-        src/routes/auth.routes.ts)
-            type="feat(api)"
-            message="add password reset endpoints to auth routes"
+        dist/utils/upload.js)
+            type="build"
+            message="add compiled file upload utility"
             ;;
-        src/middlewares/auth.middleware.ts)
-            type="feat(middleware)"
-            message="add authentication middleware"
+        dist/validations/product.validation.js)
+            type="build"
+            message="add compiled product validation schemas"
             ;;
-        src/middlewares/error.middleware.ts)
-            type="feat(middleware)"
-            message="add error handling middleware"
-            ;;
-        src/middlewares/validation.middleware.ts)
-            type="feat(middleware)"
-            message="add validation middleware"
-            ;;
-        src/services/email.service.ts)
-            type="feat(service)"
-            message="add password reset email templates"
-            ;;
-        src/services/prisma.service.ts)
-            type="feat(service)"
-            message="add database service using Prisma"
-            ;;
-        src/utils/jwt.ts)
-            type="feat(utils)"
-            message="add JWT utility functions"
-            ;;
-        src/utils/otp.ts)
-            type="feat(utils)"
-            message="add OTP generation utility"
+        dist/validations/cart.validation.js)
+            type="build"
+            message="add compiled cart validation schemas"
             ;;
         src/app.ts)
             type="feat(core)"
-            message="add Express application setup"
+            message="update Express application with product and cart routes"
             ;;
-        src/server.ts)
-            type="feat(core)"
-            message="add server initialization"
-            ;;
-        src/routes/*)
+        src/controllers/auth.controller.ts)
             type="feat(api)"
-            message="add API routes for ${file##*/}"
+            message="update auth controller"
             ;;
-        src/types/*)
-            type="feat(types)"
-            message="add TypeScript type definitions"
+        src/controllers/product.controller.ts)
+            type="feat(api)"
+            message="add product controller for product management"
             ;;
-        src/validations/auth.validation.ts)
+        src/controllers/cart.controller.ts)
+            type="feat(api)"
+            message="add cart controller for shopping cart functionality"
+            ;;
+        src/routes/product.routes.ts)
+            type="feat(api)"
+            message="add product routes"
+            ;;
+        src/routes/cart.routes.ts)
+            type="feat(api)"
+            message="add cart routes"
+            ;;
+        src/utils/upload.ts)
+            type="feat(utils)"
+            message="add file upload utility for product images"
+            ;;
+        src/validations/product.validation.ts)
             type="feat(validation)"
-            message="add validation schemas for password reset"
+            message="add product validation schemas"
             ;;
-        src/validations/*)
+        src/validations/cart.validation.ts)
             type="feat(validation)"
-            message="add request validation schemas"
+            message="add cart validation schemas"
             ;;
-        .gitignore)
+        uploads/)
             type="chore"
-            message="add gitignore configuration"
-            ;;
-        tsconfig.json)
-            type="chore"
-            message="add TypeScript configuration"
-            ;;
-        structure.txt)
-            type="docs"
-            message="add project structure documentation"
+            message="add uploads directory for product images"
             ;;
         commit.sh)
             type="chore"
-            message="add commit automation script"
+            message="update commit automation script"
             ;;
         *)
             type="chore"
-            message="add ${file##*/}"
+            message="update ${file##*/}"
             ;;
     esac
 
@@ -147,23 +127,35 @@ commit_and_push_changes() {
 
     # Modified files
     modified_files=(
+        "commit.sh"
         "dist/app.js"
         "dist/controllers/auth.controller.js"
-        "dist/routes/auth.routes.js"
-        "dist/server.js"
-        "dist/services/email.service.js"
-        "dist/validations/auth.validation.js"
+        "package-lock.json"
+        "package.json"
         "prisma/schema.prisma"
+        "src/app.ts"
         "src/controllers/auth.controller.ts"
-        "src/routes/auth.routes.ts"
-        "src/services/email.service.ts"
-        "src/validations/auth.validation.ts"
     )
 
     # Untracked files
     untracked_files=(
-        "commit.sh"
-        "prisma/migrations/20250305192740_add_password_reset_fields/"
+        "dist/controllers/cart.controller.js"
+        "dist/controllers/product.controller.js"
+        "dist/routes/cart.routes.js"
+        "dist/routes/product.routes.js"
+        "dist/utils/upload.js"
+        "dist/validations/cart.validation.js"
+        "dist/validations/product.validation.js"
+        "prisma/migrations/20250308192727_add_product_fields/"
+        "prisma/migrations/20250309205300_add_cart_models/"
+        "src/controllers/cart.controller.ts"
+        "src/controllers/product.controller.ts"
+        "src/routes/cart.routes.ts"
+        "src/routes/product.routes.ts"
+        "src/utils/upload.ts"
+        "src/validations/cart.validation.ts"
+        "src/validations/product.validation.ts"
+        "uploads/"
     )
 
     # Process modified files
