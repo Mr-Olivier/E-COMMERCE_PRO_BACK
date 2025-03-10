@@ -36,6 +36,8 @@ model User {
   verificationCode  String?
   verificationExpiry DateTime?
   // New fields for password reset
+
+  cart              Cart?
   resetPasswordCode String?
   resetPasswordExpiry DateTime?
   createdAt         DateTime  @default(now())
@@ -45,18 +47,41 @@ model User {
 }
 
 // Define the Product model
+
+// Add ProductCategory enum
+enum ProductCategory {
+  SMARTPHONES
+  LAPTOPS
+  TVS
+  GAMING
+  ACCESSORIES
+  CAMERAS
+  AUDIO
+}
+
+// Add ProductStatus enum
+enum ProductStatus {
+  ACTIVE
+  DRAFT
+  OUT_OF_STOCK
+}
+
+// Update Product model
 model Product {
-  id          String     @id @default(uuid())
-  name        String
-  price       Decimal
-  description String
-  category    String
-  stock       Int
-  images      String[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  reviews     Review[]
-  orderItems  OrderItem[]
+  id            String          @id @default(uuid())
+  name          String
+  price         Decimal
+  originalPrice Decimal?        // Optional field for sale items
+  description   String
+  category      ProductCategory
+  stock         Int
+  status        ProductStatus   @default(ACTIVE)
+  images        String[]
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+  reviews       Review[]
+  orderItems    OrderItem[]
+   cartItems     CartItem[] 
 }
 
 // Define the Order model
@@ -95,4 +120,26 @@ model Review {
   updatedAt DateTime @updatedAt
 
   @@unique([productId, userId])
+}
+
+model Cart {
+  id        String     @id @default(uuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        String   @id @default(uuid())
+  cartId    String
+  cart      Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
 }
