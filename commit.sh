@@ -349,7 +349,7 @@ commit_and_push_changes() {
     echo "Do you want to push changes to the remote repository? (y/n)"
     read -r response
     if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
-        git push --force origin main
+        git push origin main
         echo "All changes have been committed and pushed successfully!"
     else
         echo "Changes have been committed locally. Use 'git push' to push them when ready."
