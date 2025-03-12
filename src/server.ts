@@ -72,9 +72,9 @@ app.listen(port, () => {
   console.log(
     `\n${colors.bright}${colors.cyan}🚀 Available Endpoints:${colors.reset}`
   );
-  console.log(
-    `${colors.green}GET  ${colors.reset}/                           Health check`
-  );
+
+  // Auth endpoints
+  console.log(`\n${colors.bright}${colors.cyan}Authentication:${colors.reset}`);
   console.log(
     `${colors.yellow}POST ${colors.reset}/api/auth/register           User registration`
   );
@@ -85,7 +85,113 @@ app.listen(port, () => {
     `${colors.yellow}POST ${colors.reset}/api/auth/login              User login`
   );
   console.log(
+    `${colors.yellow}POST ${colors.reset}/api/auth/logout             User logout`
+  );
+  console.log(
     `${colors.yellow}POST ${colors.reset}/api/auth/resend-otp         Resend verification code`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/auth/forgot-password    Request password reset`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/auth/verify-reset-otp   Verify reset code`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/auth/reset-password     Set new password`
+  );
+
+  // User endpoints
+  console.log(
+    `\n${colors.bright}${colors.cyan}User Management:${colors.reset}`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/users/profile           Get user profile`
+  );
+  console.log(
+    `${colors.blue}PATCH${colors.reset}/api/users/profile           Update user profile`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/users/change-password   Change password`
+  );
+
+  // Product endpoints
+  console.log(
+    `\n${colors.bright}${colors.cyan}Product Management:${colors.reset}`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/products                Get all products`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/products/:id            Get product details`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/products                Create product (Admin)`
+  );
+  console.log(
+    `${colors.blue}PUT  ${colors.reset}/api/products/:id            Update product (Admin)`
+  );
+  console.log(
+    `${colors.red}DEL  ${colors.reset}/api/products/:id            Delete product (Admin)`
+  );
+
+  // Cart endpoints
+  console.log(
+    `\n${colors.bright}${colors.cyan}Cart Management:${colors.reset}`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/cart                    Get user's cart`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/cart/items              Add item to cart`
+  );
+  console.log(
+    `${colors.blue}PUT  ${colors.reset}/api/cart/items/:itemId      Update cart item`
+  );
+  console.log(
+    `${colors.red}DEL  ${colors.reset}/api/cart/items/:itemId      Remove from cart`
+  );
+  console.log(
+    `${colors.red}DEL  ${colors.reset}/api/cart                    Clear cart`
+  );
+
+  // Order endpoints
+  console.log(
+    `\n${colors.bright}${colors.cyan}Order Management:${colors.reset}`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/orders                  Get user's orders`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/orders/:id              Get order details`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/orders                  Create order from cart`
+  );
+  console.log(
+    `${colors.blue}PATCH${colors.reset}/api/orders/:id/cancel       Cancel order`
+  );
+  console.log(
+    `${colors.green}GET  ${colors.reset}/api/orders/admin/all        Get all orders (Admin)`
+  );
+  console.log(
+    `${colors.blue}PATCH${colors.reset}/api/orders/:id/status       Update order status (Admin)`
+  );
+
+  // Payment endpoints
+  console.log(
+    `\n${colors.bright}${colors.cyan}Payment Processing:${colors.reset}`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/checkout/create-checkout-session  Create payment session`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/checkout/confirm-payment          Confirm payment`
+  );
+
+  // Health check
+  console.log(`\n${colors.bright}${colors.cyan}System:${colors.reset}`);
+  console.log(
+    `${colors.green}GET  ${colors.reset}/                           Health check`
   );
 
   // Print a divider
