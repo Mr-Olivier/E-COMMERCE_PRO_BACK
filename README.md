@@ -283,4 +283,4 @@ This project is licensed under the MIT License.
 
 ---
 
-Made with ❤️ by [ Olivier Iradukunda ](https://github.com/Mr-Olivier)
+Made with ❤️ by [Olivier Iradukunda](https://github.com/Mr-Olivier)
