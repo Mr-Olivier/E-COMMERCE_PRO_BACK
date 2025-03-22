@@ -185,9 +185,14 @@ app.listen(port, () => {
     `${colors.yellow}POST ${colors.reset}/api/checkout/create-checkout-session  Create payment session`
   );
   console.log(
-    `${colors.yellow}POST ${colors.reset}/api/checkout/confirm-payment          Confirm payment`
+    `${colors.yellow}POST ${colors.reset}/api/checkout/confirm-payment            Confirm payment`
   );
-
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/checkout/create-paypal-checkout        Create-PayPal-Checkout`
+  );
+  console.log(
+    `${colors.yellow}POST ${colors.reset}/api/checkout/confirm-paypal-payment        Confirm-PayPal-Payment`
+  );
   // Health check
   console.log(`\n${colors.bright}${colors.cyan}System:${colors.reset}`);
   console.log(
