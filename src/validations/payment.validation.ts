@@ -13,3 +13,17 @@ export const confirmPaymentValidation = [
     .isString()
     .withMessage("Order ID must be a string"),
 ];
+
+export const confirmPayPalPaymentValidation = [
+  body("paypalOrderId")
+    .notEmpty()
+    .withMessage("PayPal order ID is required")
+    .isString()
+    .withMessage("PayPal order ID must be a string"),
+
+  body("orderId")
+    .notEmpty()
+    .withMessage("Order ID is required")
+    .isString()
+    .withMessage("Order ID must be a string"),
+];
