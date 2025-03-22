@@ -2,10 +2,15 @@ import { Router } from "express";
 import {
   createCheckoutSession,
   confirmPayment,
+  createPayPalCheckout,
+  confirmPayPalPayment,
 } from "../controllers/checkout.controller";
 import { authenticate } from "../middlewares/auth.middleware";
 import { validate } from "../middlewares/validation.middleware";
-import { confirmPaymentValidation } from "../validations/payment.validation";
+import {
+  confirmPaymentValidation,
+  confirmPayPalPaymentValidation,
+} from "../validations/payment.validation";
 
 const router = Router();
 
@@ -18,6 +23,17 @@ router.post(
   authenticate,
   validate(confirmPaymentValidation),
   confirmPayment
+);
+
+// PayPal checkout
+router.post("/create-paypal-checkout", authenticate, createPayPalCheckout);
+
+// Confirm PayPal payment
+router.post(
+  "/confirm-paypal-payment",
+  authenticate,
+  validate(confirmPayPalPaymentValidation),
+  confirmPayPalPayment
 );
 
 export default router;
